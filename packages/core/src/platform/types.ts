@@ -21,12 +21,22 @@ export abstract class ChocoPlatform extends EventEmitter {
    * @param message - the message to send.
    * @returns the updated message
    */
-  public abstract send(channelID: string, message: string): Promise<ChocoMessage>;
+  public send(channelID: string, message: (string|ChocoMessageOptions)): Promise<ChocoMessage> {
+    if (typeof message === 'string') {
+      return this.send(channelID, {
+        content: message,
+      });
+    }
+
+    return this.pristineSend(channelID, message);
+  }
 
   /**
    * Destroys all of the client connections.
    */
   public abstract destroy(): Promise<void>;
+
+  protected abstract pristineSend(channelID: string, options: ChocoMessageOptions): Promise<ChocoMessage>;
 }
 
 export interface ChocoPlatform {
@@ -66,5 +76,64 @@ export interface ChocoMessage {
    * @param message - the message you wish to send.
    * @returns the new message
    */
-  reply(message: string): Promise<ChocoMessage>;
+  reply(message: (string|ChocoMessageOptions)): Promise<ChocoMessage>;
+}
+
+export interface ChocoMessageOptions {
+  /**
+   * The content
+   */
+  content?: string;
+
+  embed?: {
+    /**
+     * The header.
+     */
+    title?: {
+      content?: string;
+
+      url?: string;
+    };
+
+    /**
+     * The content
+     */
+    content?: string;
+
+    /**
+     * The hexadecimal flair color!
+     */
+    color?: string;
+
+    /**
+     * The key-value fields.
+     */
+    fields?: ChocoMessageOptionsField[];
+
+    /**
+     * The footer.
+     */
+    footer?: {
+      content?: string;
+
+      iconURL?: string;
+    };
+  }
+}
+
+export interface ChocoMessageOptionsField {
+  /**
+   * The field name.
+   */
+  name: string;
+
+  /**
+   * The field value.
+   */
+  value: string;
+
+  /**
+   * Whether the field should be displayed inline.
+   */
+  inline?: boolean;
 }

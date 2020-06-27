@@ -1,16 +1,18 @@
 import readline from 'readline';
 
-import { ChocoPlatform, ChocoMessage, ChocoUser } from '@team-choco/core';
-
-export const WHOAMI = 'me';
+import { ChocoPlatform, ChocoMessage, ChocoUser, ChocoMessageOptions } from '@team-choco/core';
+import { convertChocoMessageOptionsToContent } from './utils/converter';
 
 export class ChocoShellPlatform extends ChocoPlatform {
-  private options: ChocoShellPlatformOptions;
+  private options: ChocoShellPlatformInternalOptions;
   private rl: readline.Interface;
 
   constructor(options: ChocoShellPlatformOptions) {
     super();
-    this.options = options;
+    this.options = {
+      whoami: 'User',
+      ...options,
+    };
 
     this.rl = readline.createInterface({
       input: process.stdin,
@@ -35,18 +37,20 @@ export class ChocoShellPlatform extends ChocoPlatform {
     this.emit('ready');
   }
 
-  async send(message: string): Promise<ChocoMessage> {
+  protected async pristineSend(channelID: string, options: ChocoMessageOptions): Promise<ChocoMessage> {
     const info = this.info();
 
-    await this.write(this.options.name, message);
+    const content = convertChocoMessageOptionsToContent(options);
+
+    await this.write(this.options.name, content);
 
     return {
       author: {
         id: info.id,
         username: info.username,
       },
-      content: message,
-      reply: this.send.bind(this),
+      content: content,
+      reply: this.send.bind(this, channelID),
     };
   }
 
@@ -61,21 +65,21 @@ export class ChocoShellPlatform extends ChocoPlatform {
 
     const [, who, content] = match;
 
-    if ([this.options.name, WHOAMI].includes(who)) return;
+    if ([this.options.name, this.options.whoami].includes(who)) return;
 
     // Handle it!
     if (!who) {
       await this.clear(-1);
-      await this.write(WHOAMI, content);
+      await this.write(this.options.whoami, content);
     }
 
     this.emit('message', {
       author: {
-        id: who || WHOAMI,
-        username: who || WHOAMI,
+        id: who || this.options.whoami,
+        username: who || this.options.whoami,
       },
       content: content.trim(),
-      reply: this.send.bind(this),
+      reply: this.send.bind(this, ''),
     });
   }
 
@@ -86,8 +90,14 @@ export class ChocoShellPlatform extends ChocoPlatform {
   }
 
   private async write(who: string, message: string) {
-    this.rl.write(`<${who}>: ${message}\n`);
+    for (const content of message.split('\n')) {
+      this.rl.write(`<${who}>: ${content}\n`);
+    }
   }
+}
+
+export interface ChocoShellPlatformInternalOptions extends ChocoShellPlatformOptions {
+  whoami: string;
 }
 
 export interface ChocoShellPlatformOptions {
@@ -95,4 +105,11 @@ export interface ChocoShellPlatformOptions {
    * The bots username.
    */
   name: string;
+
+  /**
+   * Your username.
+   *
+   * @defaultValue 'user'
+   */
+  whoami?: string;
 }

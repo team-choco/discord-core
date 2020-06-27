@@ -1,6 +1,6 @@
-import { Client, Message, TextChannel, DMChannel, Channel } from 'discord.js';
+import { Client, Message, TextChannel, DMChannel, Channel, MessageOptions, MessageEmbedOptions } from 'discord.js';
 
-import { ChocoPlatform, ChocoMessage, ChocoUser } from '@team-choco/core';
+import { ChocoPlatform, ChocoMessage, ChocoUser, ChocoMessageOptions } from '@team-choco/core';
 
 export class ChocoDiscordPlatform extends ChocoPlatform {
   private client: Client;
@@ -39,7 +39,7 @@ export class ChocoDiscordPlatform extends ChocoPlatform {
     };
   }
 
-  async send(channelID: string, content: string): Promise<ChocoMessage> {
+  async pristineSend(channelID: string, options: ChocoMessageOptions): Promise<ChocoMessage> {
     const info = this.info(true);
 
     const channel = await this.client.channels.fetch(channelID);
@@ -47,6 +47,25 @@ export class ChocoDiscordPlatform extends ChocoPlatform {
     if (!this.isTextBasedChannel(channel)) {
       throw new Error(`Channel must be either a "text" or "dm" channel. (${channelID})`);
     }
+
+    const embed: (undefined|MessageEmbedOptions) = options.embed ? {
+      ...(options.embed.title ? {
+        title: options.embed.title.content,
+        url: options.embed.title.url,
+      } : undefined),
+      description: options.embed.content,
+      color: options.embed.color ? parseInt(options.embed.color, 16) : undefined,
+      fields: options.embed.fields,
+      footer: options.embed.footer ? {
+        text: options.embed.footer.content,
+        iconURL: options.embed.footer.iconURL,
+      } : undefined,
+    } : undefined;
+
+    const content: MessageOptions = {
+      content: options.content,
+      embed: embed,
+    };
 
     const message = await channel.send(content);
 

@@ -6,7 +6,7 @@
     "start": "lerna run start --parallel --stream",
     "build": "lerna run build --parallel --include-dependencies --ignore @team-choco/examples-*",
     "build:prod": "lerna run build --parallel --ignore @team-choco/examples-* --ignore @team-choco/*-helpers",
-    "build:watch": "lerna run --parallel build:watch --include-dependencies --no-private",
+    "build:watch": "lerna run --parallel build:watch --include-dependencies --ignore @team-choco/examples-*",
     "version": "lerna version --no-private",
     "release": "lerna publish from-git --no-private",
     "lint": "eslint . --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint",

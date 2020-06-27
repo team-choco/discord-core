@@ -18,7 +18,8 @@
   "module": "dist/shell-platform.module.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@team-choco/core": "^0.1.1"
+    "@team-choco/core": "^0.1.1",
+    "chalk": "^4.1.0"
   },
   "devDependencies": {
     "@team-choco/test-helpers": "^0.0.0"

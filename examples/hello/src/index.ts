@@ -17,14 +17,25 @@ bot.command('hello', async ({ message }) => {
 });
 
 bot.command('welcome <...name>', async ({ message, args }) => {
-  await message.reply(`Welcome to the server ${args.name}!`);
+  await message.reply({
+    embed: {
+      title: {
+        content: 'Hello World!',
+      },
+      color: '1ABC9C',
+      fields: [{
+        name: 'Hello',
+        value: args.name,
+      }],
+    },
+  });
+});
+
+bot.on('ready', () => {
+  console.log('Kweh! Choco Bot is now up and running!');
 });
 
 process.on('SIGINT', async () => {
   await bot.destroy();
   process.exit(0);
-});
-
-bot.on('ready', () => {
-  console.log('Kweh! Choco Bot is now up and running!');
 });
