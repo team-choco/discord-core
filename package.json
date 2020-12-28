@@ -39,7 +39,7 @@
     "jest": "^26.1.0",
     "lerna": "^3.22.1",
     "lint-staged": "^10.2.11",
-    "microbundle": "^0.12.2",
+    "microbundle": "^0.13.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.1.1"
   },
