@@ -1,14 +1,14 @@
 import { sinon, chance, SinonStub, wait } from '@team-choco/test-helpers';
-import { ChocoBotCore } from '@team-choco/core';
+import { ChocoBotCore, ChocoMessage } from '@team-choco/core';
 
 import { ChocoCommandPlugin } from '../plugin';
-import { ChocoCommandListener } from '../command';
 
 describe('class(ChocoCommandPlugin)', () => {
   let bot: ChocoBotCore;
   beforeEach(() => {
     bot = {
       on: sinon.stub(),
+      emit: sinon.stub(),
     } as unknown as ChocoBotCore;
   });
 
@@ -39,6 +39,40 @@ describe('class(ChocoCommandPlugin)', () => {
       bot.command(chance.word(), sinon.stub());
 
       expect(bot.commands).toHaveLength(1);
+    });
+  });
+
+  describe('func(prefix)', () => {
+    it('should support returning a basic prefix', async () => {
+      const expectedPrefix = chance.string();
+      const expectedMessage = {} as ChocoMessage;
+
+      const plugin = new ChocoCommandPlugin({
+        prefix: expectedPrefix,
+      });
+
+      const prefix = await plugin.prefix(expectedMessage);
+
+      expect(prefix).toEqual(expectedPrefix);
+    });
+
+    it('should support returning a dynamic prefix', async () => {
+      let expectedPrefix;
+      const expectedMessage = {} as ChocoMessage;
+
+      const plugin = new ChocoCommandPlugin({
+        prefix: (message) => {
+          expect(message).toEqual(expectedMessage);
+
+          expectedPrefix = chance.string();
+          return expectedPrefix;
+        },
+      });
+
+      const prefix = await plugin.prefix(expectedMessage);
+
+      expect(prefix).toBeTruthy();
+      expect(prefix).toEqual(expectedPrefix);
     });
   });
 

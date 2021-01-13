@@ -1,7 +1,7 @@
 import { chance } from '@team-choco/test-helpers';
 
 import { toChocoArgs } from '../args';
-import { PositionalArgumentDetails } from '../pattern';
+import { PositionalArgumentDetails } from '../../pattern';
 
 describe('struct(ChocoArgs)', () => {
   describe('func(toArgs)', () => {

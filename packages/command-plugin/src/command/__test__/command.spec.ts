@@ -1,7 +1,8 @@
 import { chance, sinon } from '@team-choco/test-helpers';
+import { ChocoArgs } from '../../args';
 
-import { ChocoCommand, ChocoCommandListenerDetails } from '../command';
-import { ChocoArgs } from '../args';
+import { ChocoCommand } from '../command';
+import { ChocoCommandListenerDetails } from '../types';
 
 describe('class(ChocoCommand)', () => {
   describe('func(constructor)', () => {

@@ -1,26 +1,38 @@
-import { chance, sinon, SinonStub, SinonSpyCall } from '@team-choco/test-helpers';
-
-import DiscordJS from 'discord.js';
+import { chance, sinon, SinonSpyCall, SinonSpy } from '@team-choco/test-helpers';
 
 import { ChocoBotCore, ChocoPlugin } from '../core';
+import { ChocoMessage, ChocoMessageOptions, ChocoPlatform, ChocoUser } from '../platform';
+
+class MockPlatform extends ChocoPlatform {
+  info(required: true): ChocoUser;
+  info(required?: boolean): (null|ChocoUser);
+  info(required?: boolean): (null|ChocoUser) {
+    throw new Error('Method not implemented.');
+  }
+
+  public login = sinon.stub().resolves();
+  public status = sinon.stub().resolves();
+  public destroy = sinon.stub().resolves();
+  public on = sinon.stub();
+
+  public message(serverID: string, channelID: string, messageID: string): Promise<ChocoMessage | null> {
+    throw new Error('Method not implemented.');
+  }
+
+  protected pristineSend(channelID: string, options: ChocoMessageOptions): Promise<ChocoMessage> {
+    throw new Error('Method not implemented.');
+  }
+
+  protected pristineEdit(channelID: string, messageID: string, options: ChocoMessageOptions): Promise<ChocoMessage> {
+    throw new Error('Method not implemented.');
+  }
+
+  protected pristineReact(channelID: string, messageID: string, emoji: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+}
 
 describe('Class(Bot)', () => {
-  let client: {
-    login: SinonStub;
-    on: SinonStub;
-    destroy: SinonStub;
-  };
-
-  beforeEach(() => {
-    client = {
-      login: sinon.stub().resolves(),
-      on: sinon.stub(),
-      destroy: sinon.stub(),
-    };
-
-    sinon.stub(DiscordJS, 'Client').returns(client);
-  });
-
   afterEach(() => {
     sinon.restore();
   });
@@ -28,7 +40,7 @@ describe('Class(Bot)', () => {
   describe('func(constructor)', () => {
     it('should construct a bot', () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
       expect(bot).toBeTruthy();
@@ -36,31 +48,31 @@ describe('Class(Bot)', () => {
 
     it('should automatically login', () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
       expect(bot).toBeTruthy();
-      sinon.assert.calledOnce(client.login);
+      sinon.assert.calledOnce(bot.platform.login as SinonSpy);
     });
 
     it('should register a "message" listener', () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
       expect(bot).toBeTruthy();
-      sinon.assert.calledTwice(client.on);
-      sinon.assert.calledWith(client.on, 'message');
+      sinon.assert.calledTwice(bot.platform.on as SinonSpy);
+      sinon.assert.calledWith(bot.platform.on as SinonSpy, 'message');
     });
 
     it('should register a "ready" listener', () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
       expect(bot).toBeTruthy();
-      sinon.assert.calledTwice(client.on);
-      sinon.assert.calledWith(client.on, 'ready');
+      sinon.assert.calledTwice(bot.platform.on as SinonSpy);
+      sinon.assert.calledWith(bot.platform.on as SinonSpy, 'ready');
     });
 
     describe('prop(plugins)', () => {
@@ -76,7 +88,7 @@ describe('Class(Bot)', () => {
         sinon.assert.notCalled(register);
 
         const bot = new ChocoBotCore({
-          token: chance.string(),
+          platform: new MockPlatform(),
 
           plugins: [
             new CustomPlugin(),
@@ -92,10 +104,10 @@ describe('Class(Bot)', () => {
   describe('event(message)', () => {
     it('should emit the event when the client emits a "message" event', async () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
-      const call = client.on.getCalls().find((call) =>
+      const call = (bot.platform.on as SinonSpy).getCalls().find((call) =>
         call.args.includes('message'),
       ) as SinonSpyCall;
 
@@ -120,10 +132,10 @@ describe('Class(Bot)', () => {
   describe('event(ready)', () => {
     it('should emit the event when the client emits a "ready" event', async () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
-      const call = client.on.getCalls().find((call) =>
+      const call = (bot.platform.on as SinonSpy).getCalls().find((call) =>
         call.args.includes('ready'),
       ) as SinonSpyCall;
 
@@ -134,7 +146,7 @@ describe('Class(Bot)', () => {
       expect(listener).toBeInstanceOf(Function);
 
       await new Promise((resolve) => {
-        bot.once('ready', resolve);
+        bot.once('ready', () => resolve(null));
 
         listener();
       });
@@ -144,7 +156,7 @@ describe('Class(Bot)', () => {
   describe('func(register)', () => {
     it('should register the plugin', async () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
       class CustomPlugin implements ChocoPlugin {
@@ -167,14 +179,14 @@ describe('Class(Bot)', () => {
   describe('func(destroy)', () => {
     it('should destroy the client', async () => {
       const bot = new ChocoBotCore({
-        token: chance.string(),
+        platform: new MockPlatform(),
       });
 
-      sinon.assert.notCalled(client.destroy);
+      sinon.assert.notCalled(bot.platform.destroy as SinonSpy);
 
       bot.destroy();
 
-      sinon.assert.calledOnce(client.destroy);
+      sinon.assert.calledOnce(bot.platform.destroy as SinonSpy);
     });
   });
 });
