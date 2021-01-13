@@ -29,10 +29,10 @@ export class ChocoCommandPlugin implements ChocoPlugin {
     this.onMessage = this.onMessage.bind(this);
 
   }
-  
+
   register(bot: ChocoBotCore): void {
     this.bot = bot;
-    
+
     this.bot.command = this.command;
     this.bot.commands = [];
 
@@ -41,7 +41,7 @@ export class ChocoCommandPlugin implements ChocoPlugin {
 
   command(pattern: string, listener: ChocoCommandListener): ChocoCommand {
     const command = new ChocoCommand({
-      pattern: this.options.prefix + pattern,
+      pattern,
       listener,
     });
 
@@ -50,18 +50,30 @@ export class ChocoCommandPlugin implements ChocoPlugin {
     return command;
   }
 
-  private async onMessage(message: ChocoMessage): Promise<void> {
-    // Bail early if our prefix doesn't match.
-    if (!message.content.startsWith(this.options.prefix)) return;
+  public async prefix(message: ChocoMessage): Promise<string> {
+    if (typeof this.options.prefix === 'function') {
+      return await this.options.prefix(message);
+    }
 
-    const command = this.bot.commands.find((command) => command.parse(message.content));
+    return this.options.prefix;
+  }
+
+  private async onMessage(message: ChocoMessage): Promise<void> {
+    const prefix = await this.prefix(message);
+
+    // Bail early if our prefix doesn't match.
+    if (!message.content.startsWith(prefix)) return;
+
+    const content = message.content.replace(new RegExp(`^${prefix}`), '');
+
+    const command = this.bot.commands.find((command) => command.parse(content));
 
     // Bail early if we couldn't find a matching command
     if (!command) return;
 
     const details: ChocoCommandListenerDetails = {
       message,
-      args: command.parse(message.content) as ChocoArgs,
+      args: command.parse(content) as ChocoArgs,
     };
 
     this.bot.emit('@team-choco/command-plugin:before', details);
@@ -79,9 +91,11 @@ export class ChocoCommandPlugin implements ChocoPlugin {
   }
 }
 
+export type ChocoPrefixGetter = (message: ChocoMessage) => (string|Promise<string>);
+
 export interface ChocoCommandPluginOptions {
   /**
    * The command prefix.
    */
-  prefix: string;
+  prefix: string | ChocoPrefixGetter;
 }
