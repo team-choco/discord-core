@@ -2,16 +2,17 @@
   "name": "@team-choco/core",
   "version": "0.0.0",
   "scripts": {
-    "postinstall": "lerna bootstrap --force-local",
-    "start": "lerna run start --parallel --stream",
-    "build": "lerna run build --parallel --include-dependencies --ignore @team-choco/examples-*",
-    "build:prod": "lerna run build --parallel --ignore @team-choco/examples-* --ignore @team-choco/*-helpers",
-    "build:watch": "lerna run --parallel build:watch --include-dependencies --ignore @team-choco/examples-*",
-    "version": "lerna version --no-private",
+    "postinstall": "lerna bootstrap --force-local --no-ci",
+    "start": "lerna run start --stream",
+    "build": "lerna run build --ignore @team-choco/examples-*",
+    "build:prod": "lerna run build --ignore @team-choco/examples-* --ignore @team-choco/*-helpers",
+    "build:watch": "lerna run build:watch --include-dependencies --ignore @team-choco/examples-*",
+    "version": "lerna version --conventional-commits --no-private --create-release github",
     "release": "npm run build:prod && lerna publish from-git --no-private",
     "lint": "eslint . --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "validate": "run-p test:coverage lint"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,7 @@
     "lerna": "^3.22.1",
     "lint-staged": "^10.2.11",
     "microbundle": "^0.13.0",
+    "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.1.1"
   },
