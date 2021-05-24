@@ -19,6 +19,6 @@
     "@team-choco/shell-platform": "^0.1.20",
     "@types/app-root-path": "^1.2.4",
     "app-root-path": "^3.0.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^10.0.0"
   }
 }
