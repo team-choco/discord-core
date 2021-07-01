@@ -12,14 +12,15 @@
     "lint": "eslint . --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "validate": "run-p test:coverage lint"
+    "validate": "run-p test:coverage lint",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/team-choco/core.git"
   },
   "contributors": [
-    "Ceci Woodward <ceci@salte.io>"
+    "Cecilia Woodward <ceci@salte.io>"
   ],
   "bugs": {
     "url": "https://github.com/team-choco/core/issues"
@@ -28,22 +29,23 @@
   "devDependencies": {
     "@types/chance": "^1.1.0",
     "@types/jest": "^26.0.3",
-    "@types/node": "^14.14.20",
-    "@types/sinon": "^9.0.4",
+    "@types/node": "^15.0.0",
+    "@types/sinon": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
-    "concurrently": "^5.2.0",
+    "concurrently": "^6.2.0",
     "eslint": "^7.3.1",
     "eslint-plugin-jest": "^24.1.3",
     "eslint-plugin-tsdoc": "^0.2.5",
-    "husky": "^4.2.5",
-    "jest": "^26.1.0",
-    "lerna": "^3.22.1",
-    "lint-staged": "^10.2.11",
+    "husky": "^7.0.0",
+    "jest": "^27.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^11.0.0",
     "microbundle": "^0.13.0",
     "npm-run-all": "^4.1.5",
+    "remove-lockfiles": "^2.1.3",
     "rimraf": "^3.0.2",
-    "ts-jest": "^26.1.1"
+    "ts-jest": "^27.0.3"
   },
   "publishConfig": {
     "access": "public"
