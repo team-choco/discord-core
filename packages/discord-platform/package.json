@@ -19,7 +19,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@team-choco/core": "^0.2.0",
-    "discord.js": "^12.2.0"
+    "discord.js": "^13.0.1"
   },
   "devDependencies": {
     "@team-choco/test-helpers": "^0.0.0"
