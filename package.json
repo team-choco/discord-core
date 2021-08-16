@@ -28,7 +28,7 @@
   "homepage": "https://github.com/team-choco/core#readme",
   "devDependencies": {
     "@types/chance": "^1.1.0",
-    "@types/jest": "^26.0.3",
+    "@types/jest": "^27.0.1",
     "@types/node": "^15.0.0",
     "@types/sinon": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
