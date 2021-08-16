@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "chance": "^1.1.6",
-    "discord.js": "^12.2.0"
+    "discord.js": "^13.1.0"
   },
   "devDependencies": {
     "sinon": "^9.0.2"
